@@ -55,11 +55,11 @@ echo ""
 
 # Build for multiple architectures
 echo -e "${CYAN}Building multi-architecture image...${NC}"
+echo -e "${YELLOW}Note: Multi-arch builds cannot use --load. Building without load.${NC}"
 docker buildx build \
     --platform "${PLATFORMS}" \
     --tag "${IMAGE_NAME}:${VERSION}" \
     --tag "${IMAGE_NAME}:latest" \
-    --load \
     .
 
 if [ $? -eq 0 ]; then

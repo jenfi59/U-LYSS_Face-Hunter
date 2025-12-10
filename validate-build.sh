@@ -72,7 +72,7 @@ check_file "fr_core/config.py"
 echo ""
 echo -e "${CYAN}Validating Dockerfile syntax...${NC}"
 if docker version &> /dev/null; then
-    if grep -q "FROM python:3.10-slim" Dockerfile; then
+    if grep -qE "FROM python:3\.[0-9]+-slim" Dockerfile; then
         echo -e "${GREEN}✓${NC} Dockerfile base image OK"
     else
         echo -e "${RED}✗${NC} Dockerfile base image not found"

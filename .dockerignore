@@ -29,16 +29,18 @@ ENV/
 *.swo
 *~
 
-# Documentation
+# Documentation (exclude most but keep essential ones)
 docs/history
 *.md
 !README.md
+!BUILD_ARM64.md
 CHANGELOG.md
 CHECK_REPORT.md
 SESSION_COMPLETE_REPORT.md
 V2_1_COMPLETE_SUMMARY.md
 PORTABLE_ENV.md
 QUICKSTART.md
+ARM64_BUILD_SUMMARY.md
 
 # Build artifacts
 build-info.txt
