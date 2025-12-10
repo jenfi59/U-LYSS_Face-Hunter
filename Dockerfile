@@ -10,15 +10,15 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
-    libxrender-dev \
+    libxrender1 \
     libgomp1 \
     libgstreamer1.0-0 \
     libgstreamer-plugins-base1.0-0 \
-    libgtk-3-0 \
+    ffmpeg \
     libavcodec-dev \
     libavformat-dev \
     libswscale-dev \
@@ -41,7 +41,7 @@ COPY . .
 RUN mkdir -p models
 
 # Set PYTHONPATH
-ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app
 
 # Expose port if needed for future web interface
 EXPOSE 8080
