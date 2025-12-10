@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+dist
+build
+*.egg
+.pytest_cache
+.coverage
+htmlcov
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation
+docs/history
+*.md
+!README.md
+CHANGELOG.md
+CHECK_REPORT.md
+SESSION_COMPLETE_REPORT.md
+V2_1_COMPLETE_SUMMARY.md
+PORTABLE_ENV.md
+QUICKSTART.md
+
+# Build artifacts
+build-info.txt
+
+# Models (keep models directory but not the files)
+models/*.npz
+
+# Temporary files
+tmp/
+*.tmp
+.DS_Store
