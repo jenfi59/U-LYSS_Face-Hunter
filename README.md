@@ -5,6 +5,8 @@
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![Version](https://img.shields.io/badge/version-2.1.0-green.svg)]()
 [![Status](https://img.shields.io/badge/status-production-brightgreen.svg)]()
+[![ARM64](https://img.shields.io/badge/ARM64-supported-green.svg)]()
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com/)
 
 ---
 
@@ -15,6 +17,7 @@
 - **🛡️ Anti-Spoofing** (blink + motion detection)
 - **⚡ Fast** (~5s verification)
 - **🔒 Secure** (2-stage defense: liveness → identity)
+- **🐳 Docker & ARM64** (Raspberry Pi, Apple Silicon, AWS Graviton)
 
 ---
 
@@ -36,7 +39,21 @@ cd FR_VERS_JP_2_1
 pip install --user -r requirements.txt
 ```
 
-> 📹 **Caméra** : Détection automatique (USB/intégrée). OpenCV utilise l'index 0 par défaut.
+**Build ARM64 (Raspberry Pi, Apple Silicon, AWS Graviton)** :
+
+```bash
+# Build pour ARM64
+./build-arm64.sh
+
+# Ou avec Docker Compose
+docker-compose up --build
+
+# Build multi-architecture (ARM64 + AMD64)
+./build-multiarch.sh
+```
+
+> 📹 **Caméra** : Détection automatique (USB/intégrée). OpenCV utilise l'index 0 par défaut.  
+> 🐳 **Docker** : Voir [BUILD_ARM64.md](BUILD_ARM64.md) pour guide complet ARM64
 
 ### Launcher Interactif (Recommandé)
 
@@ -186,6 +203,7 @@ python tests/test_system.py
 ## Documentation
 
 - **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
+- **[BUILD_ARM64.md](BUILD_ARM64.md)** - ARM64 build guide (Raspberry Pi, Apple Silicon, AWS Graviton)
 - **[docs/v2.1/API.md](docs/v2.1/API.md)** - API reference
 - **[docs/v2.1/CONFIGURATION.md](docs/v2.1/CONFIGURATION.md)** - Configuration guide
 - **[docs/v2.1/DEPLOYMENT.md](docs/v2.1/DEPLOYMENT.md)** - Deployment guide

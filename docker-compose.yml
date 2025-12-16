@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  fr-system:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+        - linux/amd64
+    image: fr-vers-jp:2.1
+    container_name: fr-system
+    privileged: true
+    environment:
+      - PYTHONPATH=/app
+      - DISPLAY=${DISPLAY:-:0}
+    volumes:
+      - ./models:/app/models
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # For camera access
+      - /dev/video0:/dev/video0
+    devices:
+      - /dev/video0:/dev/video0
+    network_mode: host
+    stdin_open: true
+    tty: true
+    command: python3 launcher.py

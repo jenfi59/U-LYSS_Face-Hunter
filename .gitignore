@@ -29,3 +29,6 @@ htmlcov/
 # Temporary
 *.log
 *.tmp
+
+# Docker
+build-info.txt
