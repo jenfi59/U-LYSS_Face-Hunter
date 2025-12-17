@@ -1,4 +1,4 @@
-# FR_VERS_JP 2.1
+# Face Hunter FR_VERS_JP 2.1
 
 **Facial Recognition System** using landmarks, DTW, and anti-spoofing.
 
