@@ -53,9 +53,6 @@ git branch -r | grep -v HEAD
 
 print_header "Analyse des branches à supprimer"
 
-# Branches à conserver
-KEEP_BRANCHES=("main" "HEAD")
-
 # Branches à supprimer (non-main branches)
 BRANCHES_TO_DELETE=()
 
@@ -89,10 +86,10 @@ echo "Total : ${#BRANCHES_TO_DELETE[@]} branche(s)"
 # Demander confirmation si pas en mode dry-run
 if [ "$DRY_RUN" = false ]; then
     echo ""
-    read -p "Voulez-vous supprimer ces branches ? (oui/non) : " -r
+    read -p "Voulez-vous supprimer ces branches ? (oui/yes/y) : " -r
     echo ""
     
-    if [[ ! $REPLY =~ ^[Oo]ui$ ]]; then
+    if [[ ! $REPLY =~ ^([Oo]ui|[Yy]es|[Yy])$ ]]; then
         print_warning "Opération annulée par l'utilisateur"
         exit 0
     fi

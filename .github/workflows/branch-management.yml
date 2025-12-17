@@ -3,8 +3,8 @@ name: Branch Management
 
 on:
   push:
-    branches-ignore:
-      - main
+    branches:
+      - '!main'
   pull_request:
     types: [closed]
   workflow_dispatch:
