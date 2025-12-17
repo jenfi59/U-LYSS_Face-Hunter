@@ -1,0 +1,49 @@
+name: Branch Management
+# This workflow helps manage branch visibility and cleanup
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+
+jobs:
+  notify-non-main-push:
+    name: Notify Push to Non-Main Branch
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+    
+    steps:
+      - name: Branch Info
+        run: |
+          echo "⚠️ Push detected to non-main branch: ${{ github.ref_name }}"
+          echo ""
+          echo "📋 Reminder: Only the 'main' branch should be public"
+          echo ""
+          echo "Consider:"
+          echo "1. Merge this branch into 'main' when ready"
+          echo "2. Delete this branch after merging"
+          echo "3. See .github/BRANCH_VISIBILITY.md for details"
+
+  cleanup-merged-branches:
+    name: Suggest Branch Cleanup
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: List merged branches
+        run: |
+          echo "✅ Pull Request merged into: ${{ github.event.pull_request.base.ref }}"
+          echo "🔀 Source branch: ${{ github.event.pull_request.head.ref }}"
+          echo ""
+          echo "💡 Suggestion: Delete the source branch to keep only 'main' visible"
+          echo ""
+          echo "Run this command to delete the branch:"
+          echo "  git push origin --delete ${{ github.event.pull_request.head.ref }}"

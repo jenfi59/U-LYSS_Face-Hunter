@@ -1,0 +1,58 @@
+# Repository settings for U-LYSS Face Hunter
+# This file can be used with the Probot Settings app (https://probot.github.io/apps/settings/)
+# to automatically configure repository settings
+
+repository:
+  # Repository name
+  name: U-LYSS_Face-Hunter
+  
+  # Repository description
+  description: "Facial Recognition System using landmarks, DTW, and anti-spoofing"
+  
+  # Default branch
+  default_branch: main
+  
+  # Visibility (private or public)
+  private: false
+  
+  # Features
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  has_downloads: true
+
+# Branch protection rules
+branches:
+  # Protect main branch
+  - name: main
+    protection:
+      # Required pull request reviews
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: false
+      
+      # Required status checks
+      required_status_checks:
+        strict: false
+        contexts: []
+      
+      # Enforce restrictions
+      enforce_admins: false
+      
+      # Restrictions (who can push)
+      restrictions: null
+      
+      # Require signed commits
+      required_signatures: false
+      
+      # Allow force pushes
+      allow_force_pushes: false
+      
+      # Allow deletions
+      allow_deletions: false
+
+  # Restrict other branches - make them less visible by hiding from default views
+  # Note: GitHub doesn't support full branch visibility control via API
+  # For complete restriction, branches should be deleted or made private
+  # through repository settings in the web UI
