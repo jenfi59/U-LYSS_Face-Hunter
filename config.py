@@ -73,7 +73,7 @@ BILATERAL_SIGMA_SPACE: float = 75.0  # filter sigma in coordinate space
 
 
 # ========================================================================
-# PCA and GMM parameters
+# PCA and GMM parameters (not available for this release)
 # ========================================================================
 
 # Number of principal components to retain in PCA
