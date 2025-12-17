@@ -142,7 +142,7 @@ VERIFICATION_DETECT_INTERVAL: int = 5
 
 
 # ========================================================================
-# World model and LLR parameters
+# World model and LLR parameters (not available for this release)
 # ========================================================================
 
 # Path to world/impostor GMM model (optional, for LLR calculation)
