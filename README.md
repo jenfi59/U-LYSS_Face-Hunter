@@ -25,31 +25,11 @@
 
 ### Installation
 
-**Sur cet ordinateur** - Le système est portable et prêt à l'emploi.
-
-```bash
-cd FR_VERS_JP_2_1
-# Toutes les dépendances sont déjà installées (--user)
-```
-
-**Sur un nouvel ordinateur** - Installer les dépendances :
+**Sur un ordinateur** - Installer les dépendances :
 
 ```bash
 cd FR_VERS_JP_2_1
 pip install --user -r requirements.txt
-```
-
-**Build ARM64 (Raspberry Pi, Apple Silicon, AWS Graviton)** :
-
-```bash
-# Build pour ARM64
-./build-arm64.sh
-
-# Ou avec Docker Compose
-docker-compose up --build
-
-# Build multi-architecture (ARM64 + AMD64)
-./build-multiarch.sh
 ```
 
 > 📹 **Caméra** : Détection automatique (USB/intégrée). OpenCV utilise l'index 0 par défaut.  
@@ -203,7 +183,6 @@ python tests/test_system.py
 ## Documentation
 
 - **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
-- **[BUILD_ARM64.md](BUILD_ARM64.md)** - ARM64 build guide (Raspberry Pi, Apple Silicon, AWS Graviton)
 - **[docs/v2.1/API.md](docs/v2.1/API.md)** - API reference
 - **[docs/v2.1/CONFIGURATION.md](docs/v2.1/CONFIGURATION.md)** - Configuration guide
 - **[docs/v2.1/DEPLOYMENT.md](docs/v2.1/DEPLOYMENT.md)** - Deployment guide
@@ -220,13 +199,6 @@ See **[CHANGELOG.md](CHANGELOG.md)** for version history.
 - Simplified architecture
 - Lightweight documentation
 
-**v2.0.0** (Dec 2024)
-- Landmarks + DTW
-- DDTW (velocity features)
-- Liveness detection
-
----
-
 ## Requirements
 
 ```
@@ -241,12 +213,6 @@ scipy >= 1.12
 
 ---
 
-## License
-
-MIT License
-
----
-
 ## Support
 
 - **Issues:** GitHub Issues
@@ -255,4 +221,4 @@ MIT License
 
 ---
 
-**Version 2.1.0** - Production Ready ✅
+**Version 2.1.0**  ✅
