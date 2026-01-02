@@ -298,8 +298,8 @@ Analyse exhaustive de la version finale avant déploiement sur FuriPhone, compre
 
 #### Points d'amélioration
 
-⚠️ **URL GitHub placeholder** : `https://github.com/YOUR_USERNAME/D_Face_Hunter_ARM64`  
-   → **ACTION REQUISE** : Remplacer YOUR_USERNAME avant publication
+⚠️ **URL GitHub** : `https://github.com/jenfi59/U-LYSS_Face-Hunter`  
+   → URL actuelle du dépôt GitHub
 
 ⚠️ **Citation author** : "Jean-Philippe" sans nom de famille complet  
    → Vérifier si c'est intentionnel ou compléter
@@ -607,10 +607,10 @@ python enroll_landmarks.py <username> --camera <5|6>
 1. **README.md - Remplacer placeholders** :
    ```markdown
    - https://github.com/YOUR_USERNAME/...
-   → https://github.com/jeanphi-baconnais/D_Face_Hunter_ARM64
+   → https://github.com/jenfi59/U-LYSS_Face-Hunter
    
    - Author: [@YOUR_GITHUB_USERNAME]
-   → Author: [@jeanphi-baconnais]
+   → Author: [@jenfi59]
    ```
 
 2. **Supprimer fichier obsolète** :

@@ -16,7 +16,7 @@
 ## 📁 Racine du Projet
 
 ```
-D_Face_Hunter_ARM64_Vers_1_2_final_release/
+U-LYSS_Face-Hunter/
 │
 ├── [C] launch_touchscreen.py         # Interface tactile principale (GUI complète)
 ├── [C] launch_touchscreen.sh         # Lanceur shell pour interface tactile
@@ -352,7 +352,7 @@ sounddevice==0.5.3
 ### Interface Tactile (Principale)
 
 ```bash
-cd ~/Develop/D_Face_Hunter_ARM64_Vers_1_2_final_release
+cd ~/Develop/U-LYSS_Face-Hunter
 source mp_env/bin/activate
 python launch_touchscreen.py
 ```
@@ -405,7 +405,7 @@ python verify_interactive.py
 ## 📊 Arborescence Complète Condensée
 
 ```
-D_Face_Hunter_ARM64_Vers_1_2_final_release/
+U-LYSS_Face-Hunter/
 │
 ├── [C] Scripts Principaux
 │   ├── launch_touchscreen.py (GUI tactile)
