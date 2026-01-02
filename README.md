@@ -382,7 +382,7 @@ MIT License - See LICENSE file for details
 
 ## 👤 Author
 
-**Jean-Philippe (j-phi)**
+**Jean-Philippe (j-phi) / Amir / Benjamin **
 - GitHub: [@YOUR_GITHUB_USERNAME]
 - Project: D-Face Hunter ARM64
 
@@ -404,7 +404,7 @@ If you use D-Face Hunter in your research, please cite:
 ```bibtex
 @software{dface_hunter_arm64,
   title={D-Face Hunter ARM64: Deterministic Face Recognition for ARM64 Devices},
-  author={Jean-Philippe},
+  author={Jean-Philippe / Amir},
   year={2025},
   version={1.2.1},
   url={https://github.com/YOUR_USERNAME/D_Face_Hunter_ARM64}
@@ -420,7 +420,6 @@ If you use D-Face Hunter in your research, please cite:
 - [ ] GPU acceleration (OpenCL)
 - [ ] Real‑time continuous monitoring
 - [ ] Web interface
-- [ ] Mobile app (Android/iOS)
 
 ---
 
