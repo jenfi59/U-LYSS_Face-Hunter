@@ -53,12 +53,22 @@ class LandmarkDetectorONNX:
         self.num_landmarks: int = num_landmarks if num_landmarks is not None else getattr(config, 'num_landmarks', 468)
 
         # Initialize MediaPipe FaceLandmarker
-        models_dir = config.models_dir / "mediapipe_onnx"
-        task_path = models_dir / "face_landmarker.task"
-
-        if not task_path.exists():
-            logger.error(f"MediaPipe model not found: {task_path}")
-            raise FileNotFoundError(f"Missing face_landmarker.task at {task_path}")
+        # Localisation du modèle MediaPipe.  On cherche d'abord dans
+        # ``models/mediapipe_onnx`` (nom utilisé dans les versions antérieures),
+        # puis dans ``models/mediapipe``.  Cela permet de supporter les deux
+        # conventions tout en signalant une erreur si aucun fichier n'est trouvé.
+        possible_subdirs = ["mediapipe_onnx", "mediapipe"]
+        task_path = None
+        for subdir in possible_subdirs:
+            candidate = config.models_dir / subdir / "face_landmarker.task"
+            if candidate.exists():
+                task_path = candidate
+                break
+        if task_path is None:
+            # Aucun fichier trouvé : lever une erreur explicite
+            search_list = [str(config.models_dir / d / "face_landmarker.task") for d in possible_subdirs]
+            logger.error(f"MediaPipe model not found. Tried: {search_list}")
+            raise FileNotFoundError(f"Missing face_landmarker.task in {search_list}")
 
         base_options = python.BaseOptions(model_asset_path=str(task_path))
         options = vision.FaceLandmarkerOptions(

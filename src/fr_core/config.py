@@ -153,7 +153,12 @@ class Config:
     # Threshold on the composite score.  A value of 1.0 means that the
     # average normalised distance across all components must not exceed the
     # individual thresholds.  Lower values make the decision stricter.
-    composite_threshold: float = 1.0
+    # Par défaut, le score composite doit rester inférieur à 0.8 pour qu'une
+    # correspondance soit jugée valide.  Cela équivaut à exiger que, en moyenne,
+    # chaque distance normalisée reste en dessous de 80 % de son seuil interne.
+    # Des valeurs plus basses rendent la décision plus stricte, tandis que des
+    # valeurs proches de 1.0 rendent l'algorithme plus permissif.
+    composite_threshold: float = 0.8
 
     # Margin required between the best and second best composite scores in
     # 1:N identification.  For example, ``0.2`` requires the best score to
@@ -165,7 +170,12 @@ class Config:
     # margin check, allowing acceptance when a single candidate has
     # the lowest score regardless of the next best.  This setting is
     # useful when two enrolment identities refer to the same person.
-    composite_margin: float = 0.0
+    # Marge relative minimale entre le meilleur et le second meilleur score
+    # composite en 1:N.  Par défaut, un écart d'au moins 20 % est exigé pour
+    # considérer qu'un candidat l'emporte clairement.  Un réglage trop faible
+    # augmente le risque d'accepter un imposteur lorsque plusieurs scores
+    # sont proches ; un réglage trop élevé peut entraîner des rejets injustifiés.
+    composite_margin: float = 0.2
 
     # Coverage parameters for pose‑majority voting.  When poses are
     # available, the coverage is defined as the fraction of probe frames
@@ -183,8 +193,17 @@ class Config:
     # impostors are present; however it is appropriate when the
     # gallery contains multiple enrolments of the same individual and
     # coverage may otherwise be low.
-    coverage_threshold: float = 0.0
-    coverage_margin: float = 0.0
+    # Seuil minimal de couverture : proportion de frames du probe ayant au moins
+    # une correspondance de pose dans la séquence d'enrôlement.  Par défaut,
+    # 30 % des frames doivent être comparées pour considérer la validation
+    # suffisante.  Un seuil plus élevé diminue le risque de faux positifs.
+    coverage_threshold: float = 0.3
+    # Marge de couverture : écart minimal de couverture entre le meilleur et
+    # le second meilleur candidat.  Par défaut, un écart d'au moins 20 % est
+    # requis pour valider une identification en 1:N.  Cela permet d'éviter
+    # d'accepter un candidat dont la couverture est trop proche de celle du
+    # second meilleur.
+    coverage_margin: float = 0.2
     
     # === SYSTÈME MULTIMODAL ===
     multimodal_enabled: bool = False  # Master switch
@@ -359,4 +378,49 @@ def get_config() -> Config:
     global _config
     if _config is None:
         _config = Config()
+        # Charger les paramètres d'utilisateur personnalisés depuis config/user_config.json
+        # Si ce fichier existe, ses valeurs écrasent les attributs par défaut du dataclass.
+        try:
+            # Le fichier user_config.json est recherché dans le dossier config à la racine du projet
+            project_root = _config.project_root  # Racine du projet déterminée par défaut
+            user_config_path = project_root / "config" / "user_config.json"
+            if user_config_path.exists():
+                with open(user_config_path, "r", encoding="utf-8") as f:
+                    overrides = json.load(f)
+                # Appliquer les paramètres en ignorant ceux qui ne correspondent pas aux attributs existants
+                for key, value in overrides.items():
+                    if hasattr(_config, key):
+                        setattr(_config, key, value)
+        except Exception as e:
+            # Ne pas interrompre l'exécution si la configuration utilisateur n'est pas lisible
+            print(f"[WARNING] Impossible de charger config/user_config.json: {e}")
     return _config
+
+def save_user_config(config: Config) -> None:
+    """Enregistre la configuration utilisateur dans config/user_config.json.
+
+    Les champs du dataclass `Config` sont sérialisés dans un dictionnaire
+    et écrits dans le fichier JSON. Seuls les champs simples (int, float, str, bool)
+    sont enregistrés. Les listes, tuples et objets complexes ne sont pas
+    supportés et seront ignorés.
+
+    Args:
+        config: instance de Config à sérialiser.
+    """
+    try:
+        data = {}
+        for field_name in config.__dataclass_fields__:
+            value = getattr(config, field_name)
+            # N'enregistrer que les types simples pour éviter les structures non sérialisables
+            if isinstance(value, (int, float, str, bool)):
+                data[field_name] = value
+        # Assurer l'existence du dossier de configuration
+        project_root = config.project_root
+        config_dir = project_root / "config"
+        config_dir.mkdir(parents=True, exist_ok=True)
+        user_config_path = config_dir / "user_config.json"
+        with open(user_config_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
+        print(f"[INFO] Configuration utilisateur enregistrée dans {user_config_path}")
+    except Exception as e:
+        print(f"[WARNING] Impossible d'enregistrer la configuration utilisateur: {e}")

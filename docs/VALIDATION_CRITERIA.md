@@ -48,9 +48,9 @@ où :
 
 Un **candidat est accepté** si :
 
-1. Son `score` est inférieur à `composite_threshold` (**1.0** par défaut).  Un score < 1 signifie qu’en moyenne chaque composante est inférieure à son seuil.
-2. La **marge relative** `(score_second - score_best) / score_best` est supérieure à `composite_margin` (**0.0** par défaut ; une valeur nulle désactive la marge).  Cette marge évite qu’un candidat soit accepté si un autre a un score très proche.  Si la marge est faible, l’identification est jugée **ambiguë** et aucun utilisateur n’est renvoyé.
-3. La **couverture** est supérieure à `coverage_threshold` (**0.0** par défaut ; 0.0 désactive la contrainte) et dépasse la couverture du deuxième meilleur d’au moins `coverage_margin` (**0.0** par défaut).
+1. Son `score` est inférieur à `composite_threshold` (0.8 par défaut).  Un score < 1 signifie qu’en moyenne chaque composante est inférieure à son seuil.
+2. La **marge relative** `(score_second - score_best) / score_best` est supérieure à `composite_margin` (20 % par défaut).  Cela évite qu’un candidat soit accepté si un autre a un score très proche, comme cela pouvait se produire avec un simple seuil.  Si la marge est faible, l’identification est jugée **ambiguë** et aucun utilisateur n’est renvoyé.
+3. La **couverture** est supérieure à `coverage_threshold` (30 % par défaut) et dépasse la couverture du deuxième meilleur d’au moins `coverage_margin` (20 %).
 
 ## Ajustement des paramètres
 

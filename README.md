@@ -69,13 +69,7 @@ pip install opencv_whl_4_12/opencv_contrib_python-4.12.0-py3-none-linux_aarch64.
 pip install "numpy<2.0" mediapipe==0.10.18 scipy scikit-learn dtaidistance
 
 # Télécharger le modèle MediaPipe (si non inclus)
-# Le modèle recommandé est `face_landmarker_v2_with_blendshapes.task`.
-# Ce fichier contient la version v2 du Face Landmarker avec refinements d’iris (478 points).
-# Si ce fichier n'est pas disponible, le script d'installation téléchargera automatiquement
-# le fichier `face_landmarker.task` en version legacy.
 mkdir -p models/mediapipe
-wget -O models/mediapipe/face_landmarker_v2_with_blendshapes.task \
-  https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker_v2_with_blendshapes.task || \
 wget -O models/mediapipe/face_landmarker.task \
   https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task
 ```
@@ -198,7 +192,7 @@ D_Face_Hunter_ARM64_Vers_1_2_sameperson/
 │
 ├── models/
 │   ├── mediapipe/
-│   │   └── face_landmarker_v2_with_blendshapes.task
+│   │   └── face_landmarker.task
 │   └── users/                   # Enrolled users (.npz files)
 │
 ├── docs/
@@ -239,13 +233,27 @@ config.weight_invariant = 0.4
 config.weight_stable    = 0.3
 config.weight_pose      = 0.2
 config.weight_ratio     = 0.1
-config.composite_threshold = 1.0
+config.composite_threshold = 0.8
 config.composite_margin    = 0.2
 config.coverage_threshold  = 0.3
 config.coverage_margin     = 0.2
 ```
 
 2. **En passant des arguments au niveau des scripts**. Les scripts `enroll_interactive.py` et `verify_interactive.py` acceptent des options en ligne de commande (par exemple `--matching-mode`, `--pose-epsilon-yaw`, etc.) qui écrasent les valeurs par défaut du dataclass.
+
+3. **Via l’interface tactile (`launch_touchscreen.py`)** : lorsque vous exécutez le script `launch_touchscreen.py`, un bouton **PARAMETRES** s’affiche dans le menu principal.  Il ouvre un écran de réglage qui permet d’ajuster les principaux seuils (DTW, pose, spatiotemporel, composite) ainsi que les marges et la couverture au moyen de boutons `+` et `–`.  Les valeurs sélectionnées sont enregistrées dans le fichier `config/user_config.json` via `save_user_config()` et sont automatiquement réappliquées à chaque lancement.
+
+4. **Via le script en ligne de commande `scripts/settings_cli.py`** : ce script permet de modifier les paramètres depuis le terminal sans passer par l’interface graphique.  Par exemple :
+
+```bash
+python scripts/settings_cli.py \
+    --composite_threshold 0.8 \
+    --composite_margin 0.2 \
+    --coverage_threshold 0.3 \
+    --coverage_margin 0.2
+```
+
+Le script prend en charge plusieurs arguments correspondant aux attributs de la classe `Config` (voir `scripts/settings_cli.py --help` pour la liste complète).  Les modifications sont enregistrées dans `config/user_config.json`.  Utilisez `--reset` pour supprimer ce fichier et revenir aux valeurs par défaut.
 
 Les paramètres disponibles sont décrits en détail dans les fichiers `docs/VALIDATION_CRITERIA.md` et `docs/MODES.md`.
 

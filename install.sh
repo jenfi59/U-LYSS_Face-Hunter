@@ -106,27 +106,15 @@ echo "✅ Dependencies installed"
 echo ""
 
 echo "[3/6] Checking MediaPipe model..."
-# Préférer le modèle v2_with_blendshapes s'il existe ou le télécharger.
-MODEL_DIR="models/mediapipe"
-MODEL_V2="$MODEL_DIR/face_landmarker_v2_with_blendshapes.task"
-MODEL_LEGACY="$MODEL_DIR/face_landmarker.task"
-mkdir -p "$MODEL_DIR"
-if [ -f "$MODEL_V2" ]; then
-    echo "✅ Modèle MediaPipe v2 déjà présent ($MODEL_V2)"
-elif [ -f "$MODEL_LEGACY" ]; then
-    echo "✅ Modèle MediaPipe legacy déjà présent ($MODEL_LEGACY)"
+MODEL_PATH="models/mediapipe/face_landmarker.task"
+if [ ! -f "$MODEL_PATH" ]; then
+    echo "Téléchargement du modèle MediaPipe (~3.7 MB)..."
+    mkdir -p models/mediapipe
+    wget -q --show-progress -O "$MODEL_PATH" \
+      "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task"
+    echo "✅ Modèle téléchargé"
 else
-    echo "Téléchargement du modèle MediaPipe v2_with_blendshapes (~3.7 MB)..."
-    # Essayer de télécharger le modèle v2.  Si l'URL échoue, retomber sur le modèle legacy.
-    if wget -q --show-progress -O "$MODEL_V2" \
-      "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker_v2_with_blendshapes.task"; then
-        echo "✅ Modèle v2 téléchargé"
-    else
-        echo "⚠️  Téléchargement du modèle v2 échoué, téléchargement du modèle legacy..."
-        wget -q --show-progress -O "$MODEL_LEGACY" \
-          "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task"
-        echo "✅ Modèle legacy téléchargé"
-    fi
+    echo "✅ Modèle déjà présent"
 fi
 echo ""
 

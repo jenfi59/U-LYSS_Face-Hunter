@@ -11,6 +11,9 @@ from pathlib import Path
 import cv2
 import numpy as np
 import re
+import json
+import csv
+from datetime import datetime
 
 print("[DEBUG] Script démarré")
 
@@ -21,6 +24,8 @@ os.environ['QT_QPA_PLATFORM'] = 'xcb'
 os.environ['DISPLAY'] = ':0'
 
 print("[DEBUG] Configuration effectuée")
+
+from src.fr_core.config import get_config, save_user_config
 
 class TouchscreenUI:
     """Interface tactile pour l'enrollment"""
@@ -43,6 +48,16 @@ class TouchscreenUI:
         self.button_color = (168, 9, 9)  # BGR pour #0909A8 (bleu marin)
         self.selected_color = (100, 200, 100)  # Vert pour sélection
         self.text_color = (255, 255, 255)  # Blanc
+
+        # Charger la configuration globale
+        try:
+            self.config = get_config()
+        except Exception as e:
+            print(f"[WARNING] Impossible de charger la configuration: {e}")
+            self.config = None
+
+        # Stocker le mode de validation courant pour le logging
+        self.current_validation_mode = None
         
         # Désactiver la mise en veille automatique
         try:
@@ -113,6 +128,7 @@ class TouchscreenUI:
             ("ENROLLMENT", 'enrollment', "Enroler un nouveau visage"),
             ("VALIDATION", 'validation', "Verifier une identite"),
             ("GESTION", 'manage', "Gerer les modeles"),
+            ("PARAMETRES", 'settings', "Regler les options"),
             ("QUITTER", 'quit', "Fermer l'application")
         ]
         
@@ -745,6 +761,119 @@ class TouchscreenUI:
             cv2.waitKey(100)
         
         return selected_mode[0]
+
+    def settings_menu_screen(self):
+        """Écran de réglage des paramètres de validation.
+
+        Affiche une liste de paramètres ajustables (seuils et marges)
+        avec des boutons + et - pour augmenter ou diminuer leur valeur.
+        Les modifications sont appliquées à la configuration en mémoire
+        et peuvent être sauvegardées via le bouton « SAUVER ».
+        """
+        # Paramètres à ajuster : (label, attribut du Config, pas d'incrément, min, max)
+        param_defs = [
+            ("Seuil DTW", "dtw_threshold", 0.1, 0.0, 20.0),
+            ("Seuil Pose", "pose_threshold", 0.1, 0.0, 20.0),
+            ("Seuil SpatioTemp.", "spatiotemporal_threshold", 0.1, 0.0, 20.0),
+            ("Seuil Composite", "composite_threshold", 0.05, 0.0, 5.0),
+            ("Marge Composite", "composite_margin", 0.05, 0.0, 1.0),
+            ("Seuil Couverture", "coverage_threshold", 0.05, 0.0, 1.0),
+            ("Marge Couverture", "coverage_margin", 0.05, 0.0, 1.0)
+        ]
+
+        # Copie des valeurs actuelles
+        local_values = {attr: float(getattr(self.config, attr)) for (_, attr, _, _, _) in param_defs}
+
+        # Dimensions
+        row_height = 100
+        base_y = 250
+        btn_w = 80
+        btn_h = 60
+        label_x = 40
+        minus_x = 400
+        value_x = 500
+        plus_x = 640
+        # Footer
+        footer_y = base_y + len(param_defs) * row_height + 80
+
+        # Fonction de dessin
+        def draw_settings_screen():
+            img = self.create_blank_screen()
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            # Titre
+            cv2.putText(img, "Réglages des paramètres", (60, 120), font, 1.2, (0, 0, 0), 3)
+            cv2.putText(img, "Ajustez les seuils et marges", (60, 180), font, 0.7, (50, 50, 50), 2)
+            # Chaque paramètre
+            for idx, (label, attr, step, pmin, pmax) in enumerate(param_defs):
+                y = base_y + idx * row_height
+                # Label
+                cv2.putText(img, label, (label_x, y + 40), font, 0.7, (0, 0, 0), 2)
+                # Bouton -
+                self.draw_button(img, minus_x, y + 10, btn_w, btn_h, "-")
+                # Valeur
+                val_text = f"{local_values[attr]:.2f}"
+                cv2.putText(img, val_text, (value_x, y + 50), font, 0.8, (0, 0, 0), 2)
+                # Bouton +
+                self.draw_button(img, plus_x, y + 10, btn_w, btn_h, "+")
+            # Boutons Sauver / Retour
+            self.draw_button(img, 60, footer_y, 280, 80, "SAUVER", color=(50, 200, 50))
+            self.draw_button(img, 380, footer_y, 280, 80, "RETOUR", color=(200, 50, 50))
+            cv2.imshow(self.window_name, img)
+
+        # Afficher une première fois
+        draw_settings_screen()
+
+        # Boucle événementielle
+        selected_action = [None]
+        def mouse_callback(event, x, y, flags, param):
+            if event == cv2.EVENT_LBUTTONDOWN:
+                # Parcourir chaque paramètre pour voir si un bouton +/- est cliqué
+                for idx, (label, attr, step, pmin, pmax) in enumerate(param_defs):
+                    row_y = base_y + idx * row_height
+                    # Bouton -
+                    if minus_x <= x <= minus_x + btn_w and row_y + 10 <= y <= row_y + 10 + btn_h:
+                        new_val = local_values[attr] - step
+                        if new_val < pmin: new_val = pmin
+                        local_values[attr] = round(new_val, 3)
+                        draw_settings_screen()
+                        return
+                    # Bouton +
+                    if plus_x <= x <= plus_x + btn_w and row_y + 10 <= y <= row_y + 10 + btn_h:
+                        new_val = local_values[attr] + step
+                        if new_val > pmax: new_val = pmax
+                        local_values[attr] = round(new_val, 3)
+                        draw_settings_screen()
+                        return
+                # Sauver
+                if 60 <= x <= 60 + 280 and footer_y <= y <= footer_y + 80:
+                    selected_action[0] = 'save'
+                    return
+                # Retour
+                if 380 <= x <= 380 + 280 and footer_y <= y <= footer_y + 80:
+                    selected_action[0] = 'back'
+                    return
+
+        cv2.setMouseCallback(self.window_name, mouse_callback)
+        # Attendre l'action
+        while selected_action[0] is None:
+            key = cv2.waitKey(100)
+            if key == 27:
+                selected_action[0] = 'back'
+        # Appliquer ou ignorer selon action
+        cv2.setMouseCallback(self.window_name, lambda *args: None)
+        if selected_action[0] == 'save':
+            # Appliquer les valeurs au Config et sauvegarder
+            for (_, attr, _, _, _) in param_defs:
+                setattr(self.config, attr, float(local_values[attr]))
+            try:
+                save_user_config(self.config)
+            except Exception as e:
+                print(f"[WARNING] Erreur lors de l'enregistrement des paramètres: {e}")
+        # On efface l'écran après
+        cv2.destroyWindow(self.window_name)
+        # Recréation de la fenêtre principale
+        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
+        cv2.resizeWindow(self.window_name, self.screen_width, self.screen_height)
     
     def validation_capture_screen(self, model_name, mode):
         """Écran de capture pour la validation avec bouton START"""
@@ -839,66 +968,142 @@ class TouchscreenUI:
         if 'error' in result:
             cv2.putText(img, f"Erreur: {result['error']}", (80, y_detail), font, 0.7, (0, 0, 200), 2)
         
-        # Boutons d'action
+        # Boutons de feedback (correct / incorrect)
+        feedback_y = y_detail + 40
+        feedback_btn_width = 280
+        feedback_btn_height = 80
+        # Correct (vert) et Incorrect (rouge)
+        correct_x = 60
+        incorrect_x = 380
+        self.draw_button(img, correct_x, feedback_y, feedback_btn_width, feedback_btn_height, "CORRECT", color=(0, 180, 0))
+        self.draw_button(img, incorrect_x, feedback_y, feedback_btn_width, feedback_btn_height, "INCORRECT", color=(0, 0, 180))
+
+        # Boutons d'action (validation, menu, quitter)
         button_width = 600
         button_height = 80
         button_x = 60
-        y_btn = 1050
+        y_btn = feedback_y + feedback_btn_height + 60
         spacing = 100
-        
+
         buttons = [
             ("NOUVELLE VALIDATION", 'restart'),
             ("MENU PRINCIPAL", 'menu'),
             ("QUITTER", 'quit')
         ]
-        
         for idx, (btn_text, action) in enumerate(buttons):
             btn_y = y_btn + idx * spacing
             self.draw_button(img, button_x, btn_y, button_width, button_height, btn_text)
-        
+
         # S'assurer que la fenêtre existe avant d'afficher
         try:
             cv2.getWindowProperty(self.window_name, cv2.WND_PROP_VISIBLE)
         except:
             cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
             cv2.resizeWindow(self.window_name, self.screen_width, self.screen_height)
-        
+
         cv2.imshow(self.window_name, img)
         cv2.waitKey(1)  # Forcer le refresh
-        
+
         selected_action = [None]
-        
+        feedback_logged = [False]
+
         def mouse_callback(event, x, y, flags, param):
             if event == cv2.EVENT_LBUTTONDOWN:
+                # Vérifier feedback
+                if correct_x <= x <= correct_x + feedback_btn_width and feedback_y <= y <= feedback_y + feedback_btn_height:
+                    if not feedback_logged[0]:
+                        self.save_validation_log(result, "correct")
+                        feedback_logged[0] = True
+                    return
+                if incorrect_x <= x <= incorrect_x + feedback_btn_width and feedback_y <= y <= feedback_y + feedback_btn_height:
+                    if not feedback_logged[0]:
+                        self.save_validation_log(result, "incorrect")
+                        feedback_logged[0] = True
+                    return
+                # Vérifier action
                 for idx, (btn_text, action) in enumerate(buttons):
                     btn_y = y_btn + idx * spacing
                     if button_x <= x <= button_x + button_width and btn_y <= y <= btn_y + button_height:
                         selected_action[0] = action
                         return
-        
+
         try:
             cv2.setMouseCallback(self.window_name, mouse_callback)
         except cv2.error as e:
             print(f"[WARNING] Erreur setMouseCallback: {e}")
-            # Recréer la fenêtre si nécessaire
             cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
             cv2.resizeWindow(self.window_name, self.screen_width, self.screen_height)
             cv2.imshow(self.window_name, img)
             cv2.setMouseCallback(self.window_name, mouse_callback)
-        
+
         while selected_action[0] is None:
             key = cv2.waitKey(100)
             if key == 27:  # ESC
                 selected_action[0] = 'menu'
                 break
-        
+
         # Nettoyer le callback avant de quitter
         try:
             cv2.setMouseCallback(self.window_name, lambda *args: None)
         except:
             pass
-        
+
         return selected_action[0]
+
+    def save_validation_log(self, result: dict, feedback: str):
+        """Enregistre les résultats de validation et les paramètres dans data/validation_logs.csv.
+
+        Args:
+            result: dictionnaire contenant les informations de validation (user_id, distance, coverage, frames_used, verified).
+            feedback: "correct" si l'utilisateur confirme le résultat, "incorrect" sinon.
+        """
+        try:
+            # Préparation des données
+            timestamp = datetime.now().isoformat()
+            # Charger config actuelle
+            config = get_config()
+            log_dir = PROJECT_DIR / "data"
+            log_dir.mkdir(parents=True, exist_ok=True)
+            log_path = log_dir / "validation_logs.csv"
+            # Header
+            header = [
+                "timestamp", "user_id", "mode", "verified", "user_feedback",
+                "distance", "coverage", "frames_used",
+                "dtw_threshold", "pose_threshold", "spatiotemporal_threshold",
+                "composite_threshold", "composite_margin",
+                "coverage_threshold", "coverage_margin",
+                "weight_invariant", "weight_stable", "weight_pose", "weight_ratio"
+            ]
+            row = {
+                "timestamp": timestamp,
+                "user_id": result.get("user_id", ""),
+                "mode": getattr(self, "current_validation_mode", ""),
+                "verified": result.get("verified", False),
+                "user_feedback": feedback,
+                "distance": result.get("distance", 0.0),
+                "coverage": result.get("coverage", "N/A"),
+                "frames_used": result.get("frames_used", "N/A"),
+                "dtw_threshold": getattr(config, "dtw_threshold", ""),
+                "pose_threshold": getattr(config, "pose_threshold", ""),
+                "spatiotemporal_threshold": getattr(config, "spatiotemporal_threshold", ""),
+                "composite_threshold": getattr(config, "composite_threshold", ""),
+                "composite_margin": getattr(config, "composite_margin", ""),
+                "coverage_threshold": getattr(config, "coverage_threshold", ""),
+                "coverage_margin": getattr(config, "coverage_margin", ""),
+                "weight_invariant": getattr(config, "weight_invariant", ""),
+                "weight_stable": getattr(config, "weight_stable", ""),
+                "weight_pose": getattr(config, "weight_pose", ""),
+                "weight_ratio": getattr(config, "weight_ratio", "")
+            }
+            write_header = not log_path.exists()
+            with open(log_path, "a", newline="", encoding="utf-8") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=header)
+                if write_header:
+                    writer.writeheader()
+                writer.writerow(row)
+            print(f"[INFO] Résultat enregistré dans {log_path}")
+        except Exception as e:
+            print(f"[WARNING] Impossible d'enregistrer le log: {e}")
     
     def run_validation_capture(self, model_name, model_path):
         """Capture vidéo pour validation avec affichage du flux"""
@@ -1060,7 +1265,8 @@ class TouchscreenUI:
             'distance': distance,
             'user_id': model_name,
             'frames_used': max_frames,
-            'coverage': f"{details.get('coverage', 0):.1f}%" if 'coverage' in details else 'N/A'
+            'coverage': f"{details.get('coverage', 0):.1f}%" if 'coverage' in details else 'N/A',
+            'mode': getattr(self, 'current_validation_mode', '')
         }
         
         return result
@@ -1077,6 +1283,8 @@ class TouchscreenUI:
             mode = self.select_validation_mode_screen(model_name)
             if mode == 'back':
                 continue  # Retour à la sélection de modèle
+            # Mémoriser le mode de validation pour le logging
+            self.current_validation_mode = mode
             
             # 3. Écran de capture
             action = self.validation_capture_screen(model_name, mode)
@@ -1188,6 +1396,11 @@ def main():
                 cv2.destroyAllWindows()
                 ui.enable_sleep()
                 sys.exit(0)
+            return main()
+        elif action == 'settings':
+            # Afficher le menu des réglages
+            ui.settings_menu_screen()
+            cv2.destroyAllWindows()
             return main()
         elif action == 'manage':
             print("Gestion à implémenter")

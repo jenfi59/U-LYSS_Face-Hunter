@@ -16,15 +16,7 @@ export DISPLAY=:0
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PROJECT_ROOT="$SCRIPT_DIR"
 export MODELS_DIR="$PROJECT_ROOT/models"
-# Sélection du modèle MediaPipe.  Deux fichiers peuvent être présents :
-# - face_landmarker_v2_with_blendshapes.task (nouveau modèle 3D)
-# - face_landmarker.task (ancienne convention)
-# Utiliser le v2 par défaut s'il existe, sinon fallback vers l'ancien.
-if [ -f "$MODELS_DIR/mediapipe/face_landmarker_v2_with_blendshapes.task" ]; then
-    export MEDIAPIPE_MODEL="$MODELS_DIR/mediapipe/face_landmarker_v2_with_blendshapes.task"
-else
-    export MEDIAPIPE_MODEL="$MODELS_DIR/mediapipe/face_landmarker.task"
-fi
+export MEDIAPIPE_MODEL="$MODELS_DIR/mediapipe/face_landmarker.task"
 
 # Ajouter src au PYTHONPATH
 export PYTHONPATH="$PROJECT_ROOT/src:$PYTHONPATH"

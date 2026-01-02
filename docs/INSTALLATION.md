@@ -141,22 +141,13 @@ pip install scipy scikit-learn dtaidistance
 
 ### Étape 6 : Télécharger le Modèle MediaPipe
 
-Le modèle recommandé pour la v1.2.1 est **`face_landmarker_v2_with_blendshapes.task`**, qui
-contient la version v2 du Face Landmarker avec raffinements d’iris (478 points).
-Si ce fichier n'est pas disponible, vous pouvez utiliser le fichier legacy
-`face_landmarker.task`. Le script `install.sh` choisira automatiquement le modèle
-disponible.
-
 ```bash
 mkdir -p models/mediapipe
-# Télécharger la version v2 (préféré)
-wget -O models/mediapipe/face_landmarker_v2_with_blendshapes.task \
-  https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker_v2_with_blendshapes.task || \
 wget -O models/mediapipe/face_landmarker.task \
   https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task
 ```
 
-**📦 Taille** : ~3.7 MB
+**📦 Taille** : ~3.7 MB
 
 ### Étape 7 : Vérification de l'Installation
 
