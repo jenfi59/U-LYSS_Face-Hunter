@@ -1010,14 +1010,22 @@ class TouchscreenUI:
         def mouse_callback(event, x, y, flags, param):
             if event == cv2.EVENT_LBUTTONDOWN:
                 # Vérifier feedback
+                # Bouton CORRECT: log sans demande d'identité
                 if correct_x <= x <= correct_x + feedback_btn_width and feedback_y <= y <= feedback_y + feedback_btn_height:
                     if not feedback_logged[0]:
-                        self.save_validation_log(result, "correct")
+                        # aucune vraie identité à fournir
+                        self.save_validation_log(result, "correct", true_identity=None)
                         feedback_logged[0] = True
                     return
+                # Bouton INCORRECT: demander l'identité réelle puis log
                 if incorrect_x <= x <= incorrect_x + feedback_btn_width and feedback_y <= y <= feedback_y + feedback_btn_height:
                     if not feedback_logged[0]:
-                        self.save_validation_log(result, "incorrect")
+                        try:
+                            # demande identité réelle parmi INCONNU ou utilisateurs enregistrés
+                            true_id = self.ask_identity_screen()
+                        except Exception:
+                            true_id = ""
+                        self.save_validation_log(result, "incorrect", true_identity=true_id)
                         feedback_logged[0] = True
                     return
                 # Vérifier action
@@ -1050,12 +1058,13 @@ class TouchscreenUI:
 
         return selected_action[0]
 
-    def save_validation_log(self, result: dict, feedback: str):
+    def save_validation_log(self, result: dict, feedback: str, true_identity: str = None):
         """Enregistre les résultats de validation et les paramètres dans data/validation_logs.csv.
 
         Args:
             result: dictionnaire contenant les informations de validation (user_id, distance, coverage, frames_used, verified).
             feedback: "correct" si l'utilisateur confirme le résultat, "incorrect" sinon.
+            true_identity: identité réelle saisie par l'utilisateur lorsque le résultat est incorrect. Peut être None.
         """
         try:
             # Préparation des données
@@ -1065,9 +1074,9 @@ class TouchscreenUI:
             log_dir = PROJECT_DIR / "data"
             log_dir.mkdir(parents=True, exist_ok=True)
             log_path = log_dir / "validation_logs.csv"
-            # Header
+            # Header avec identité réelle
             header = [
-                "timestamp", "user_id", "mode", "verified", "user_feedback",
+                "timestamp", "user_id", "true_identity", "mode", "verified", "user_feedback",
                 "distance", "coverage", "frames_used",
                 "dtw_threshold", "pose_threshold", "spatiotemporal_threshold",
                 "composite_threshold", "composite_margin",
@@ -1077,6 +1086,7 @@ class TouchscreenUI:
             row = {
                 "timestamp": timestamp,
                 "user_id": result.get("user_id", ""),
+                "true_identity": true_identity if true_identity is not None else "",
                 "mode": getattr(self, "current_validation_mode", ""),
                 "verified": result.get("verified", False),
                 "user_feedback": feedback,
@@ -1104,6 +1114,75 @@ class TouchscreenUI:
             print(f"[INFO] Résultat enregistré dans {log_path}")
         except Exception as e:
             print(f"[WARNING] Impossible d'enregistrer le log: {e}")
+    
+    def ask_identity_screen(self):
+        """Affiche un écran pour choisir l'identité réelle lorsque le résultat est incorrect.
+
+        Retourne une chaîne correspondant à l'identité sélectionnée (ou "INCONNU" si l'identité n'est pas dans la base).
+        """
+        # Construire la liste des identités disponibles
+        try:
+            users_dir = PROJECT_DIR / "models" / "users"
+            user_files = list(users_dir.glob("*.npz")) if users_dir.exists() else []
+            identities = ["INCONNU"] + [f.stem for f in sorted(user_files)]
+        except Exception:
+            identities = ["INCONNU"]
+
+        # Préparer l'affichage
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        selected_id = [None]
+        # Créer et afficher la fenêtre
+        try:
+            cv2.destroyWindow(self.window_name)
+        except:
+            pass
+        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
+        cv2.resizeWindow(self.window_name, self.screen_width, self.screen_height)
+        img = self.create_blank_screen()
+        # Titre
+        title = "Sélection de l'identité réelle"
+        text_size = cv2.getTextSize(title, font, 1.0, 3)[0]
+        cv2.putText(img, title, ((self.screen_width - text_size[0]) // 2, 120), font, 1.0, (0, 0, 0), 3)
+        # Disposition des boutons
+        btn_width = 600
+        btn_height = 80
+        x = 60
+        y_start = 250
+        spacing = 100
+        # Dessiner les boutons pour chaque identité
+        for idx, ident in enumerate(identities):
+            btn_y = y_start + idx * spacing
+            self.draw_button(img, x, btn_y, btn_width, btn_height, ident)
+        # Bouton Annuler
+        cancel_y = y_start + len(identities) * spacing
+        self.draw_button(img, x, cancel_y, btn_width, btn_height, "ANNULER", color=(180, 180, 180))
+
+        cv2.imshow(self.window_name, img)
+        cv2.waitKey(1)
+
+        def mouse_cb(event, mx, my, flags, param):
+            if event == cv2.EVENT_LBUTTONDOWN:
+                # Vérifier chaque bouton
+                for idx, ident in enumerate(identities):
+                    btn_y = y_start + idx * spacing
+                    if x <= mx <= x + btn_width and btn_y <= my <= btn_y + btn_height:
+                        selected_id[0] = ident
+                        return
+                # Bouton annuler
+                if x <= mx <= x + btn_width and cancel_y <= my <= cancel_y + btn_height:
+                    selected_id[0] = ""
+                    return
+
+        cv2.setMouseCallback(self.window_name, mouse_cb)
+        # Boucle d'attente
+        while selected_id[0] is None:
+            key = cv2.waitKey(100)
+            if key == 27:  # ESC annule
+                selected_id[0] = ""
+                break
+        # Nettoyer
+        cv2.setMouseCallback(self.window_name, lambda *args: None)
+        return selected_id[0]
     
     def run_validation_capture(self, model_name, model_path):
         """Capture vidéo pour validation avec affichage du flux"""
