@@ -94,8 +94,8 @@ pyenv install 3.12.12
 
 ```bash
 cd ~/Develop  # ou votre dossier de projets
-git clone https://github.com/jenfi59/U-LYSS_Face-Hunter.git
-cd U-LYSS_Face-Hunter
+git clone https://github.com/YOUR_USERNAME/D_Face_Hunter_ARM64.git
+cd D_Face_Hunter_ARM64_Vers_1_2_final_release
 ```
 
 ### Étape 4 : Créer l'Environnement Virtuel
@@ -340,7 +340,7 @@ dtaidistance>=2.3.0
 Pour mettre à jour D-Face Hunter :
 
 ```bash
-cd U-LYSS_Face-Hunter
+cd D_Face_Hunter_ARM64_Vers_1_2_final_release
 git pull origin main
 
 # Réactiver l'environnement
@@ -360,7 +360,7 @@ rm -rf mp_env
 
 # Supprimer le dossier du projet
 cd ..
-rm -rf U-LYSS_Face-Hunter
+rm -rf D_Face_Hunter_ARM64_Vers_1_2_final_release
 
 # (Optionnel) Désinstaller pyenv
 rm -rf ~/.pyenv

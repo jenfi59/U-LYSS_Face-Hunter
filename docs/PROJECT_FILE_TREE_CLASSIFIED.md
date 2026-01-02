@@ -16,7 +16,7 @@
 ## 📁 Racine du Projet
 
 ```
-U-LYSS_Face-Hunter/
+D_Face_Hunter_ARM64_Vers_1_2_final_release/
 │
 ├── [C] launch_touchscreen.py         # Interface tactile principale (GUI complète)
 ├── [C] launch_touchscreen.sh         # Lanceur shell pour interface tactile
@@ -256,7 +256,9 @@ mp_env/                                 [W] Environnement virtuel complet
 
 ## 🗑️ Fichiers Obsolètes Identifiés
 
-Aucun fichier obsolète identifié. Tous les fichiers du projet sont actifs et maintenus.
+| Fichier | Raison | Action Recommandée |
+|---------|--------|-------------------|
+| `scripts/verify_mediapipe.py` | Remplacé par intégration dans launch_touchscreen.py | **Archiver ou supprimer** |
 
 ---
 
@@ -268,12 +270,12 @@ Aucun fichier obsolète identifié. Tous les fichiers du projet sont actifs et m
 |-----------|--------|-------------|
 | **[C] Critique** | 22 | Scripts principaux + config + fr_core |
 | **[T] Testing** | 37 | Suite complète de tests |
-| **[O] Obsolète** | 0 | Aucun fichier obsolète |
+| **[O] Obsolète** | 1 | Fichier à nettoyer |
 | **[W] Wheels** | 1 | Wheel OpenCV + mp_env/ |
 | **[D] Documentation** | 8 | Guides et docs |
 | **[M] Models** | 5 | Modèles MediaPipe + profils users |
 
-**Total fichiers projet** : 73 fichiers (hors mp_env/)
+**Total fichiers projet** : 74 fichiers (hors mp_env/)
 
 ### Architecture Simplifiée
 
@@ -290,8 +292,8 @@ Aucun fichier obsolète identifié. Tous les fichiers du projet sont actifs et m
 │   SCRIPTS ENROLLMENT/VERIFY  │  │   ALGORITHME (fr_core)  │
 ├──────────────────────────────┤  ├─────────────────────────┤
 │ [C] enroll_landmarks.py      │  │ [C] config.py           │
-└──────────────┬───────────────┘  │ [C] guided_enrollment.py│
-               │                  │ [C] verification_dtw.py │
+│ [O] verify_mediapipe.py*     │  │ [C] guided_enrollment.py│
+└──────────────┬───────────────┘  │ [C] verification_dtw.py │
                │                  │ [C] pose_matcher.py     │
                │                  │ [C] preprocessing.py    │
                │                  │ [C] dtw_backend.py      │
@@ -314,6 +316,9 @@ Aucun fichier obsolète identifié. Tous les fichiers du projet sont actifs et m
 │  [W] mediapipe 0.10.18                                       │
 │  [W] numpy, scipy, scikit-learn, dtaidistance                │
 └──────────────────────────────────────────────────────────────┘
+```
+
+*Note: verify_mediapipe.py marqué obsolète - fonctionnalité intégrée dans launch_touchscreen.py*
 
 ---
 
@@ -352,7 +357,7 @@ sounddevice==0.5.3
 ### Interface Tactile (Principale)
 
 ```bash
-cd ~/Develop/U-LYSS_Face-Hunter
+cd ~/Develop/D_Face_Hunter_ARM64_Vers_1_2_final_release
 source mp_env/bin/activate
 python launch_touchscreen.py
 ```
@@ -380,6 +385,10 @@ python verify_interactive.py
 
 ## 📝 Notes de Maintenance
 
+### Fichiers à Nettoyer (Optionnel)
+
+1. `scripts/verify_mediapipe.py` → Archivage ou suppression (remplacé par intégration)
+
 ### Fichiers à Ne Jamais Modifier
 
 - `models/mediapipe/face_landmarker_v2_with_blendshapes.task` → Modèle pré-entraîné
@@ -405,7 +414,7 @@ python verify_interactive.py
 ## 📊 Arborescence Complète Condensée
 
 ```
-U-LYSS_Face-Hunter/
+D_Face_Hunter_ARM64_Vers_1_2_final_release/
 │
 ├── [C] Scripts Principaux
 │   ├── launch_touchscreen.py (GUI tactile)
@@ -426,18 +435,9 @@ U-LYSS_Face-Hunter/
 │   ├── src/config_sequential.py
 │   └── src/sequential_validator.py
 │
-├── [C] Scripts Workflow (11 fichiers)
+├── [C] Scripts Workflow (2 fichiers)
 │   ├── scripts/enroll_landmarks.py
-│   ├── scripts/verify_landmarks.py
-│   ├── scripts/enroll_spatiotemporal.py
-│   ├── scripts/verify_spatiotemporal.py
-│   ├── scripts/enroll_temporal.py
-│   ├── scripts/verify_temporal.py
-│   ├── scripts/enroll_spatial.py
-│   ├── scripts/verify_spatial.py
-│   ├── scripts/enroll_sequential.py
-│   ├── scripts/verify_sequential.py
-│   └── scripts/guided_enrollment.py
+│   └── [O] scripts/verify_mediapipe.py (obsolète)
 │
 ├── [M] Modèles & Data
 │   ├── models/mediapipe/face_landmarker_v2.task
@@ -462,7 +462,7 @@ U-LYSS_Face-Hunter/
 ## ✅ Checklist Maintenance
 
 - [x] **Nettoyer** : ~~Supprimer `docs/INSTALLATION.md.old`~~ ✅ **Fait**
-- [x] **Nettoyer** : ~~Supprimer `scripts/verify_mediapipe.py`~~ ✅ **Fait**
+- [ ] **Archiver** : `scripts/verify_mediapipe.py` (obsolète)
 - [ ] **Backup** : Profils `models/users/*.npz` régulièrement
 - [ ] **Vérifier** : Wheel OpenCV présent avant installation
 - [ ] **Documenter** : Mettre à jour CHANGELOG.md pour chaque version
@@ -473,12 +473,12 @@ U-LYSS_Face-Hunter/
 **Légende Finale** :
 - **[C]** = Critique (22)
 - **[T]** = Testing (37)
-- **[O]** = Obsolète (0)
+- **[O]** = Obsolète (1)
 - **[W]** = Wheels (1 + mp_env)
 - **[D]** = Documentation (8)
 - **[M]** = Models (5)
 
-**Total** : 73 fichiers projet + mp_env (environnement virtuel complet)
+**Total** : 74 fichiers projet + mp_env (environnement virtuel complet)
 
 ---
 

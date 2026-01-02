@@ -5,7 +5,7 @@
 ### Lancement rapide
 
 ```bash
-cd ~/Develop/U-LYSS_Face-Hunter
+cd ~/Develop/D_Face_Hunter_ARM64_Vers_1_2_final_release
 ./launch_touchscreen.sh
 ```
 
@@ -107,7 +107,7 @@ Installation :
 ## Fichiers importants
 
 ```
-U-LYSS_Face-Hunter/
+D_Face_Hunter_ARM64_Vers_1_2_final_release/
 ├── enroll_touchscreen.py          # ← Interface tactile (NOUVEAU)
 ├── launch_touchscreen.sh           # ← Script de lancement (NOUVEAU)
 ├── enroll_interactive.py           # Interface clavier (original)

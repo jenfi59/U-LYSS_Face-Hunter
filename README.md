@@ -53,8 +53,8 @@ Le document `PIPELINE_OVERVIEW.md` fournit des schémas et des explications dét
 
 ```bash
 # Clone repository
-git clone https://github.com/jenfi59/U-LYSS_Face-Hunter.git
-cd U-LYSS_Face-Hunter
+git clone https://github.com/YOUR_USERNAME/D_Face_Hunter_ARM64.git
+cd D_Face_Hunter_ARM64_Vers_1_2_final_release
 
 # IMPORTANT: Installer Python 3.12 via pyenv (si pas déjà installé)
 # Voir docs/INSTALLATION.md pour installation complète de pyenv
@@ -174,7 +174,7 @@ python scripts/verify_mediapipe.py models/users/<username>.npz --camera 5 --seco
 ## 📁 Project Structure
 
 ```
-U-LYSS_Face-Hunter/
+D_Face_Hunter_ARM64_Vers_1_2_sameperson/
 ├── README.md                    # This file
 ├── requirements.txt             # Python dependencies
 ├── setup_env.sh                 # Environment setup script
@@ -256,7 +256,7 @@ Les paramètres disponibles sont décrits en détail dans les fichiers `docs/VAL
 Le dossier `tests/` contient des tests unitaires et fonctionnels basés sur `pytest`. Pour lancer tous les tests :
 
 ```bash
-cd U-LYSS_Face-Hunter
+cd D_Face_Hunter_ARM64_Vers_1_2_sameperson
 pytest -q
 ```
 
@@ -382,7 +382,7 @@ MIT License - See LICENSE file for details
 
 ## 👤 Author
 
-**Jean-Philippe (j-phi) / Amir / Benjamin **
+**Jean-Philippe (j-phi)**
 - GitHub: [@YOUR_GITHUB_USERNAME]
 - Project: D-Face Hunter ARM64
 
@@ -404,10 +404,10 @@ If you use D-Face Hunter in your research, please cite:
 ```bibtex
 @software{dface_hunter_arm64,
   title={D-Face Hunter ARM64: Deterministic Face Recognition for ARM64 Devices},
-  author={Jean-Philippe / Amir},
+  author={Jean-Philippe},
   year={2025},
   version={1.2.1},
-  url={https://github.com/jenfi59/U-LYSS_Face-Hunter}
+  url={https://github.com/YOUR_USERNAME/D_Face_Hunter_ARM64}
 }
 ```
 
@@ -420,6 +420,7 @@ If you use D-Face Hunter in your research, please cite:
 - [ ] GPU acceleration (OpenCL)
 - [ ] Real‑time continuous monitoring
 - [ ] Web interface
+- [ ] Mobile app (Android/iOS)
 
 ---
 
