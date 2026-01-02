@@ -1,0 +1,25 @@
+{
+  "yaw_offset": 85.96694032589552,
+  "pitch_offset": -53.52459848760275,
+  "roll_offset": 94.15833605489948,
+  "calibration_date": "2025-12-25T12:25:05.206969",
+  "camera_info": {
+    "resolution": [
+      640,
+      480
+    ],
+    "device_index": 0
+  },
+  "validation": {
+    "completed": true,
+    "left": true,
+    "right": true,
+    "up": true,
+    "down": true
+  },
+  "statistics": {
+    "yaw_std": 2.0452249565111638,
+    "pitch_std": 1.3252324071730868,
+    "roll_std": 0.7281171105002131
+  }
+}

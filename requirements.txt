@@ -1,0 +1,17 @@
+# D-Face Hunter ARM64 v1.2.1 - Requirements
+# Python 3.11 ou 3.12 requis (MediaPipe n'est pas disponible pour Python 3.13)
+
+# Core dependencies
+numpy>=1.24.0
+opencv-python>=4.8.0
+scipy>=1.11.0
+scikit-learn>=1.3.0
+
+# MediaPipe for face detection and landmark extraction
+mediapipe==0.10.18
+
+# Optional: Faster DTW computation (recommended)
+dtaidistance>=2.3.10
+
+# Development/Testing (optional)
+pytest>=7.4.0
