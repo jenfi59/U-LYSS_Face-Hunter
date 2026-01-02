@@ -1226,6 +1226,9 @@ def main():
         if action == 'restart':
             return main()
         elif action == 'validation':
+            # Recréer la fenêtre avant d'entrer dans le workflow de validation
+            cv2.namedWindow(ui.window_name, cv2.WINDOW_NORMAL)
+            cv2.resizeWindow(ui.window_name, 720, 1440)
             result = ui.run_validation_workflow()
             if result == 'quit':
                 ui.enable_sleep()
