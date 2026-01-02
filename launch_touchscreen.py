@@ -1156,10 +1156,17 @@ class TouchscreenUI:
         start_time = time.time()
         frame_count = 0
         
-        # Créer la fenêtre
+        # Créer la fenêtre avec les mêmes paramètres que la fenêtre principale
         validation_window = "Validation - Capture en cours"
+        try:
+            cv2.destroyWindow(validation_window)
+        except:
+            pass
         cv2.namedWindow(validation_window, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(validation_window, self.screen_width, self.screen_height)
+        cv2.moveWindow(validation_window, 0, 0)
+        cv2.setWindowProperty(validation_window, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+        cv2.waitKey(100)  # Force le refresh de la fenêtre
         
         try:
             while (time.time() - start_time) < duration or len(buffer_landmarks) < min_frames:
