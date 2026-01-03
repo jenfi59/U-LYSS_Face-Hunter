@@ -37,6 +37,8 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install Python dependencies
+# Note: Specific versions are required for ARM64 compatibility with MediaPipe
+# MediaPipe 0.10.18 requires NumPy < 2.0 (see project requirements.txt)
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir "numpy<2.0" mediapipe==0.10.18 scipy scikit-learn dtaidistance
 

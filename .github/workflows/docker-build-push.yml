@@ -53,8 +53,12 @@ jobs:
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
 
-      # Note: This is a placeholder build step since there's no Dockerfile yet
-      # Uncomment and adjust when Dockerfile is added to the repository
+      # Note: Docker image build is currently disabled since Dockerfile.example is a template.
+      # To enable builds:
+      # 1. Copy Dockerfile.example to Dockerfile: cp Dockerfile.example Dockerfile
+      # 2. Customize the Dockerfile for your needs
+      # 3. Uncomment the build step below
+      # 
       # - name: Build and push Docker image
       #   uses: docker/build-push-action@v5
       #   with:
