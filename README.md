@@ -374,6 +374,44 @@ python3 -c "import cv2; cap = cv2.VideoCapture(0); print('Camera:', cap.isOpened
 
 ---
 
+## 🐳 Docker & CI/CD
+
+Le projet inclut maintenant une intégration GitHub Actions pour la construction et le déploiement automatique d'images Docker ARM64.
+
+### Documentation Disponible
+
+- **[GITHUB_ACTIONS_SETUP.md](docs/GITHUB_ACTIONS_SETUP.md)** - Guide complet de configuration GitHub Actions et Docker Hub
+- **[DOCKER_HUB_LOGIN_FIX.md](docs/DOCKER_HUB_LOGIN_FIX.md)** - Explication détaillée de la correction du problème d'authentification Docker Hub
+- **[BEFORE_AFTER_COMPARISON.md](docs/BEFORE_AFTER_COMPARISON.md)** - Comparaison avant/après de la syntaxe correcte
+
+### Quick Start avec Docker
+
+```bash
+# Renommer le fichier exemple
+cp Dockerfile.example Dockerfile
+
+# Construire l'image (local)
+docker build -t dface-hunter:latest .
+
+# Lancer le conteneur avec accès caméra
+docker run -it --device=/dev/video0 \
+  -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  dface-hunter:latest
+```
+
+### Configuration GitHub Actions
+
+Pour activer le déploiement automatique sur Docker Hub:
+
+1. Créer un Personal Access Token sur [Docker Hub](https://hub.docker.com/)
+2. Ajouter les secrets dans GitHub: `DOCKERHUB_USERNAME` et `DOCKERHUB_TOKEN`
+3. Le workflow `.github/workflows/docker-build-push.yml` s'exécutera automatiquement
+
+**Note**: Voir [GITHUB_ACTIONS_SETUP.md](docs/GITHUB_ACTIONS_SETUP.md) pour les instructions détaillées.
+
+---
+
 ## 📝 License
 
 MIT License - See LICENSE file for details
