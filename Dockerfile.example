@@ -1,0 +1,73 @@
+# Example Dockerfile for D-Face Hunter ARM64
+# This is an example file - adjust as needed for your specific requirements
+
+FROM python:3.12-slim-bookworm
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV QT_QPA_PLATFORM=xcb
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    # OpenCV dependencies
+    libopencv-dev \
+    python3-opencv \
+    # Qt dependencies for GUI
+    libqt5gui5 \
+    libqt5core5a \
+    libqt5widgets5 \
+    # X11 dependencies
+    libxcb-xinerama0 \
+    libxcb-icccm4 \
+    libxcb-image0 \
+    libxcb-keysyms1 \
+    libxcb-randr0 \
+    libxcb-render-util0 \
+    libxcb-shape0 \
+    # Other dependencies
+    wget \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+# Note: Specific versions are required for ARM64 compatibility with MediaPipe
+# MediaPipe 0.10.18 requires NumPy < 2.0 (see project requirements.txt)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir "numpy<2.0" mediapipe==0.10.18 scipy scikit-learn dtaidistance
+
+# Note: For ARM64 builds, you may need to copy the wheel file
+# COPY opencv_whl_4_12/opencv_contrib_python-4.12.0-py3-none-linux_aarch64.whl /tmp/
+# RUN pip install --no-cache-dir /tmp/opencv_contrib_python-4.12.0-py3-none-linux_aarch64.whl
+
+# Install remaining requirements
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application
+COPY . .
+
+# Download MediaPipe model if not present
+RUN mkdir -p models/mediapipe && \
+    if [ ! -f models/mediapipe/face_landmarker_v2_with_blendshapes.task ]; then \
+        wget -O models/mediapipe/face_landmarker_v2_with_blendshapes.task \
+        https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker_v2_with_blendshapes.task || \
+        wget -O models/mediapipe/face_landmarker.task \
+        https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task; \
+    fi
+
+# Create directory for user models
+RUN mkdir -p models/users
+
+# Expose port if running as a service (optional)
+# EXPOSE 8000
+
+# Set the entrypoint
+# For interactive enrollment/verification, you'll need to run with appropriate flags
+# Example: docker run -it --device=/dev/video0 -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix dface-hunter
+CMD ["python", "verify_interactive.py"]
